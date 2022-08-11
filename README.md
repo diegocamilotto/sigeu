@@ -5,9 +5,9 @@ O repositório compreende apenas os códigos fontes do projeto SIGEU e aplicativ
 
 SIGEU:
 - Java JDK 1.8
-- Apache Tomcat 8
-- Eclipse Luna
+- Wildfly 26
+- Eclipse 2022
   - EGit plugin
   - Maven Plugin
   
-NOTA: Existem dependências via eclipse do projeto https://github.com/adamitj/oss-adamiworks que precisam ser satisfeitas.
+NOTA: Existem dependências via maven do projeto https://github.com/adamitj/oss-adamiworks que precisam ser satisfeitas.
