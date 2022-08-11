@@ -2,6 +2,10 @@ package br.edu.utfpr.dv.sigeu.service;
 
 import java.util.List;
 
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.mail.MessagingException;
+
 import org.hibernate.Hibernate;
 
 import br.edu.utfpr.dv.sigeu.dao.CampusDAO;
@@ -9,236 +13,133 @@ import br.edu.utfpr.dv.sigeu.entities.Campus;
 import br.edu.utfpr.dv.sigeu.entities.Instituicao;
 import br.edu.utfpr.dv.sigeu.exception.EntidadePossuiRelacionamentoException;
 import br.edu.utfpr.dv.sigeu.persistence.HibernateDAO;
-import br.edu.utfpr.dv.sigeu.persistence.Transaction;
 
+@Stateless
 public class CampusService {
 
-	/**
-	 * Conta a qtde de campus
-	 */
-	public static Integer contarCampus() {
-		Transaction trans = null;
-		try {
+    @EJB
+    private CampusDAO campusDAO;
 
-			trans = new Transaction();
-			trans.begin();
+    /**
+     * Conta a qtde de campus
+     */
+    public Integer contarCampus() {
+	return campusDAO.contarCampus();
+    }
 
-			CampusDAO dao = new CampusDAO(trans);
-			int q = dao.contarCampus();
-			return q;
-		} catch (Exception e) {
+    /**
+     * Cria novo
+     * 
+     * @param i
+     */
+    public void criar(Campus i) {
+	campusDAO.criar(i);
+    }
 
-		} finally {
-			if (trans != null) {
-				trans.close();
-			}
-		}
-		return null;
+    /**
+     * Altera existente
+     * 
+     * @param i
+     */
+    public void alterar(Campus i) {
+	campusDAO.alterar(i);
+    }
+
+    /**
+     * Realiza a pesquisa no banco de dados conforme o texto
+     * 
+     * @param textoPesquisa
+     * @return
+     * @throws Exception
+     */
+    public List<Campus> pesquisar(String textoPesquisa) throws Exception {
+	List<Campus> lista = null;
+
+	lista = campusDAO.pesquisa(textoPesquisa, 0);
+
+	for (Campus c : lista) {
+	    Hibernate.initialize(c.getIdInstituicao());
 	}
 
-	/**
-	 * Cria novo
-	 * 
-	 * @param i
-	 */
-	public static void criar(Campus i) {
-		Transaction trans = new Transaction();
-		trans.begin();
+	return lista;
+    }
 
-		CampusDAO dao = new CampusDAO(trans);
-		dao.criar(i);
+    /**
+     * Realiza a pesquisa no banco de dados conforme o texto
+     * 
+     * @param textoPesquisa
+     * @return
+     * @throws Exception
+     */
+    public List<Campus> pesquisar(String textoPesquisa, Instituicao instituicao) throws Exception {
+	List<Campus> lista = null;
 
-		trans.commit();
-		trans.close();
+	if (textoPesquisa == null || textoPesquisa.trim().length() <= 0) {
+	    lista = campusDAO.pesquisa(instituicao, HibernateDAO.PESQUISA_LIMITE);
+	} else {
+	    lista = campusDAO.pesquisa(textoPesquisa, instituicao, 0);
 	}
 
-	/**
-	 * Altera existente
-	 * 
-	 * @param i
-	 */
-	public static void alterar(Campus i) {
-		Transaction trans = new Transaction();
-		trans.begin();
-
-		CampusDAO dao = new CampusDAO(trans);
-		dao.alterar(i);
-
-		trans.commit();
-		trans.close();
+	for (Campus c : lista) {
+	    Hibernate.initialize(c.getIdInstituicao());
 	}
 
-	/**
-	 * Realiza a pesquisa no banco de dados conforme o texto
-	 * 
-	 * @param textoPesquisa
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<Campus> pesquisar(String textoPesquisa) throws Exception {
-		List<Campus> lista = null;
+	return lista;
+    }
 
-		Transaction trans = new Transaction();
+    /**
+     * Encontra por ID
+     * 
+     * @param editarId
+     * @return
+     * @throws Exception
+     */
+    public Campus encontrePorId(Integer editarId) throws Exception {
+	Campus obj = campusDAO.encontrePorId(editarId);
+	Hibernate.initialize(obj.getIdInstituicao());
 
-		try {
-			trans.begin();
+	return obj;
+    }
 
-			CampusDAO dao = new CampusDAO(trans);
-			lista = dao.pesquisa(textoPesquisa, 0);
+    /**
+     * Remove
+     * 
+     * @param i
+     * @throws MessagingException
+     * @throws Exception
+     */
+    public void remover(Campus i) throws EntidadePossuiRelacionamentoException, Exception {
+	Campus campusBd = campusDAO.encontrePorId(i.getIdCampus());
 
-			for (Campus c : lista) {
-				Hibernate.initialize(c.getIdInstituicao());
-			}
+	Hibernate.initialize(campusBd.getGrupoPessoaList());
+	Hibernate.initialize(campusBd.getPessoaList());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new Exception(e);
-		} finally {
-			trans.close();
-		}
-
-		return lista;
+	if (campusBd.getGrupoPessoaList().size() > 0 || campusBd.getPessoaList().size() > 0) {
+	    throw new EntidadePossuiRelacionamentoException(campusBd.getNome());
 	}
 
-	/**
-	 * Realiza a pesquisa no banco de dados conforme o texto
-	 * 
-	 * @param textoPesquisa
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<Campus> pesquisar(String textoPesquisa, Instituicao instituicao) throws Exception {
-		List<Campus> lista = null;
+	campusDAO.remover(campusBd);
+    }
 
-		Transaction trans = new Transaction();
+    public Campus encontrePorEmail(String email) throws Exception {
+	Campus obj = campusDAO.encontrePorEmail(email);
 
-		try {
-			trans.begin();
-
-			CampusDAO dao = new CampusDAO(trans);
-			if (textoPesquisa == null || textoPesquisa.trim().length() <= 0) {
-				lista = dao.pesquisa(instituicao, HibernateDAO.PESQUISA_LIMITE);
-			} else {
-				lista = dao.pesquisa(textoPesquisa, instituicao, 0);
-			}
-
-			for (Campus c : lista) {
-				Hibernate.initialize(c.getIdInstituicao());
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new Exception(e);
-		} finally {
-			trans.close();
-		}
-
-		return lista;
+	if (obj != null) {
+	    Hibernate.initialize(obj.getIdInstituicao());
+	    Hibernate.initialize(obj.getIdCampus());
+	    Hibernate.initialize(obj.getLdapServerList());
 	}
+	return obj;
+    }
 
-	/**
-	 * Encontra por ID
-	 * 
-	 * @param editarId
-	 * @return
-	 * @throws Exception
-	 */
-	public static Campus encontrePorId(Integer editarId) throws Exception {
-		Transaction trans = new Transaction();
+    public Campus encontrePorSigla(String sigla) throws Exception {
+	Campus obj = campusDAO.encontrePorSigla(sigla);
 
-		try {
-			trans.begin();
-
-			CampusDAO dao = new CampusDAO(trans);
-			Campus obj = dao.encontrePorId(editarId);
-			Hibernate.initialize(obj.getIdInstituicao());
-
-			return obj;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new Exception(e);
-		} finally {
-			trans.close();
-		}
+	if (obj != null) {
+	    Hibernate.initialize(obj.getIdInstituicao());
+	    Hibernate.initialize(obj.getIdCampus());
+	    Hibernate.initialize(obj.getLdapServerList());
 	}
-
-	/**
-	 * Remove
-	 * 
-	 * @param i
-	 * @throws MessagingException
-	 * @throws Exception
-	 */
-	public static void remover(Campus i) throws EntidadePossuiRelacionamentoException, Exception {
-		Transaction trans = new Transaction();
-
-		try {
-			trans.begin();
-
-			CampusDAO dao = new CampusDAO(trans);
-			Campus campusBd = dao.encontrePorId(i.getIdCampus());
-
-			Hibernate.initialize(campusBd.getGrupoPessoaList());
-			Hibernate.initialize(campusBd.getPessoaList());
-
-			if (campusBd.getGrupoPessoaList().size() > 0 || campusBd.getPessoaList().size() > 0) {
-				throw new EntidadePossuiRelacionamentoException(campusBd.getNome());
-			}
-
-			dao.remover(campusBd);
-			trans.commit();
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new Exception(e);
-		} finally {
-			trans.close();
-		}
-	}
-
-	public static Campus encontrePorEmail(String email) throws Exception {
-		Transaction trans = new Transaction();
-
-		try {
-			trans.begin();
-
-			CampusDAO dao = new CampusDAO(trans);
-			Campus obj = dao.encontrePorEmail(email);
-
-			if (obj != null) {
-				Hibernate.initialize(obj.getIdInstituicao());
-				Hibernate.initialize(obj.getIdCampus());
-				Hibernate.initialize(obj.getLdapServerList());
-			}
-			return obj;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new Exception(e);
-		} finally {
-			trans.close();
-		}
-	}
-
-	public static Campus encontrePorSigla(String sigla) throws Exception {
-		Transaction trans = new Transaction();
-
-		try {
-			trans.begin();
-
-			CampusDAO dao = new CampusDAO(trans);
-			Campus obj = dao.encontrePorSigla(sigla);
-
-			if (obj != null) {
-				Hibernate.initialize(obj.getIdInstituicao());
-				Hibernate.initialize(obj.getIdCampus());
-				Hibernate.initialize(obj.getLdapServerList());
-			}
-			return obj;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new Exception(e);
-		} finally {
-			trans.close();
-		}
-	}
-
+	return obj;
+    }
 }
