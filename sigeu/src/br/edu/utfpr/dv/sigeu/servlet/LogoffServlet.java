@@ -36,6 +36,6 @@ public class LogoffServlet extends HttpServlet {
 	// Set response content type
 	resp.setContentType("text/html");
 	resp.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
-	resp.setHeader("Location", url);
+	resp.setHeader("Location", url + "/Login.xhtml");
     }
 }
