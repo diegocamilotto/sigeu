@@ -137,7 +137,7 @@ public class ItemReservaDAO extends HibernateDAO<ItemReserva> {
     public List<ItemReserva> pesquisaItemReservaDisponivel(Campus campus, Date data, Date horaInicial, Date horaFinal, CategoriaItemReserva categoria,
 	    ItemReserva item) {
 
-	String sql = FileUtils.readTextFile("/br/edu/utfpr/dv/sigeu/sqlquery/Query001.sql");
+	String sql = FileUtils.readTextFile("/sqlquery/Query001.sql");
 	Query query = session.createSQLQuery(sql).addEntity(ItemReserva.class);
 
 	query.setInteger("idCampus", campus.getIdCampus());
