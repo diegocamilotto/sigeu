@@ -16,7 +16,7 @@ public class Config {
     public static final String CONFIG_ADMIN = "admin";
     public static final String CONFIG_DEBUG = "debug";
     public static final String CONFIG_PATH_UPLOAD = "path.upload";
-    public static final String CONFIG_FILE = "config.properties";
+    public static final String CONFIG_FILE = "/etc/sigeu/config.properties";
     public static final String NOME_GRUPO_EXTERNO = "EXTERNO";
     public static final String SEND_MAIL = "sendmail";
     //
@@ -38,6 +38,7 @@ public class Config {
 	try {
 	    config = FileUtils.getPropertiesFromClasspath(CONFIG_FILE);
 	} catch (IOException e) {
+	    System.out.println("Arquivo " + CONFIG_FILE + " não encontrado. Já copiou o config.properties do projeto para esse caminho?");
 	    e.printStackTrace();
 	}
 
