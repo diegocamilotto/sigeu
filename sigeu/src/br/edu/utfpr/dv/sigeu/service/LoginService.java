@@ -132,29 +132,28 @@ public class LoginService {
 		hash = "";
 	    }
 
-	    // Se chegou aqui é porque a validação ocorreu com sucesso sem
-	    // exception. Então pesquisa se já existe essa pessoa cadaservice strada
-	    // Recupera dados do usuário no LDAP
-	    Map<String, String> dataLdap = ldapUtils.getLdapProperties(uid);
-
-	    // Atualiza dados da Pessoa/Usuário
-	    String cnpjCpf = dataLdap.get(ldap.getVarLdapCnpjCpf());
-	    String matricula = dataLdap.get(ldap.getVarLdapMatricula());
-	    String nomeCompleto = dataLdap.get(ldap.getVarLdapNomeCompleto());
-
-	    pessoa.setAtivo(true);
-	    pessoa.setCnpjCpf(cnpjCpf);
-	    pessoa.setEmail(email);
-	    // pessoa.setIdCampus(ldap.getIdCampus());
-	    pessoa.setMatricula(matricula);
-	    pessoa.setNomeCompleto(nomeCompleto);
-	    pessoa.setPessoaFisica(true);
-	    pessoa.setSenhaMd5(hash);
-	    pessoa.setIdCampus(campus);
-
 	    // Confere os grupos da Pessoa
 	    List<GrupoPessoa> grupos = new ArrayList<GrupoPessoa>();
 	    if (ldapAuth) {
+		// Se chegou aqui é porque a validação ocorreu com sucesso sem
+		// exception. Então pesquisa se já existe essa pessoa cadaservice strada
+		// Recupera dados do usuário no LDAP
+		Map<String, String> dataLdap = ldapUtils.getLdapProperties(uid);
+
+		// Atualiza dados da Pessoa/Usuário
+		String cnpjCpf = dataLdap.get(ldap.getVarLdapCnpjCpf());
+		String matricula = dataLdap.get(ldap.getVarLdapMatricula());
+		String nomeCompleto = dataLdap.get(ldap.getVarLdapNomeCompleto());
+
+		pessoa.setAtivo(true);
+		pessoa.setCnpjCpf(cnpjCpf);
+		pessoa.setEmail(email);
+		// pessoa.setIdCampus(ldap.getIdCampus());
+		pessoa.setMatricula(matricula);
+		pessoa.setNomeCompleto(nomeCompleto);
+		pessoa.setPessoaFisica(true);
+		pessoa.setSenhaMd5(hash);
+		pessoa.setIdCampus(campus);
 		/*
 		 * Usuários autenticados pelo LDAP
 		 */

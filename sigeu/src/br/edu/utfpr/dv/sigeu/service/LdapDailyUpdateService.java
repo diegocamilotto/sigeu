@@ -20,7 +20,7 @@ public class LdapDailyUpdateService {
     @EJB
     private EmailService emailService;
 
-    @Schedule(hour = "3", minute = "0", second = "0", persistent = false)
+    @Schedule(hour = "10", minute = "0", second = "0", persistent = false)
     public void runDaily() {
 	Campus campusDv = campusDAO.encontrePorId(100);
 
