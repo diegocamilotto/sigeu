@@ -105,12 +105,14 @@ public class PeriodoLetivoDAO extends HibernateDAO<PeriodoLetivo> {
 	o.setNome(o.getNome().toUpperCase().trim());
     }
 
+    @SuppressWarnings("unchecked")
     public PeriodoLetivo encontreAtual(Campus campus, Date data) {
-	String hql = "from PeriodoLetivo o where :data between o.dataInicio AND o.dataFim AND o.idCampus.idCampus = :idCampus";
+	String hql = "from PeriodoLetivo o where :data between o.dataInicio AND o.dataFim AND o.idCampus.idCampus = :idCampus order by o.idPeriodoLetivo desc";
 	Query q = session.createQuery(hql);
 	q.setDate("data", data);
 	q.setInteger("idCampus", campus.getIdCampus());
-	return (PeriodoLetivo) q.uniqueResult();
-    }
+	List<PeriodoLetivo> result = q.list();
 
+	return result.isEmpty() ? null : result.get(0);
+    }
 }
