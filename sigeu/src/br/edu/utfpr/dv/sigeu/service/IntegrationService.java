@@ -381,7 +381,10 @@ public class IntegrationService {
 		c.setId(id);
 		c.setName(name);
 		c.setShortname(shortname);
-		c.setGender(e.getAttribute("gender").charAt(0));
+
+		String strGender = e.getAttribute("gender");
+		c.setGender(strGender.isEmpty() ? 'M' : strGender.charAt(0));
+
 		c.setColor(e.getAttribute("color"));
 		c.setIdTimetable(timetable);
 
@@ -958,6 +961,10 @@ public class IntegrationService {
 				    // Navega entre as classroomid do Card
 				    // IGNORAR CLASSROOMIDS DE LESSON
 				    for (String classroomid : classroomids) {
+					if (classroomid.isEmpty()) {
+					    continue;
+					}
+
 					ItemReserva sala = mapListSala.get(classroomid);
 
 					if (sala == null) {
