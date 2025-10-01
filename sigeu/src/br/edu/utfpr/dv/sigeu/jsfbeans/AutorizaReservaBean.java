@@ -162,16 +162,17 @@ public class AutorizaReservaBean extends JavaBean {
 			vo.getReserva().getHoraInicio());
 		Calendar voEnd = DateTimeUtils.getCalendarFromDates(vo.getReserva().getData(),
 			vo.getReserva().getHoraFim());
-
-		boolean conflita = DateTimeUtils.conflicts(itemStart, itemEnd, voStart, voEnd);
-
-		if (conflita) {
+		
+		if (isBetween(voStart, voEnd, itemEnd) || isBetween(itemStart, itemEnd, voEnd)) {
 		    vo.setExcluir(true);
 		    vo.setAutorizar(false);
 		}
-
 	    }
 	}
+    }
+    
+    private boolean isBetween(Calendar start, Calendar end, Calendar between) {
+	return between.after(start) && between.before(end);
     }
 
     public void marcaParaExcluir(ReservaVO item) {
